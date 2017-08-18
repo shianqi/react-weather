@@ -1,6 +1,7 @@
 :global(html){
     min-height: 100%;
     min-width: 100%;
+    overflow: hidden;
 }
 
 :global(body){

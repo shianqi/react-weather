@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import img from './img/sidebar-bg.png'
 
 class WeatherCanvas extends Component {
     componentDidMount() {
@@ -26,6 +27,8 @@ class WeatherCanvas extends Component {
                 this.style = 'rgb(255,255,255)'
                 this.diameter = 3
                 this.isLive = true
+                this.mouseSize = 150
+                this.mousePower = 0.05
             }
 
             draw() {
@@ -46,6 +49,19 @@ class WeatherCanvas extends Component {
                 this.y += this.y_speed
             }
 
+            getDist(point) {
+                const tx = this.x - point.x
+                const ty = this.y - point.y
+                return Math.sqrt(tx * tx + ty * ty)
+            }
+
+            makeWind = (mouse)=> {
+                if(this.getDist(mouse) < this.mouseSize) {
+                    this.x_speed += mouse.vx * this.mousePower
+                    this.y_speed += mouse.vy * this.mousePower
+                }
+            }
+
             shouldRemove() {
                 if(this.x > canvas.width || this.x < 0) {
                     this.isLive = false
@@ -61,7 +77,7 @@ class WeatherCanvas extends Component {
                 super(args)
                 this.x_speed = Math.random() - 0.5
                 this.y_speed = Math.random()*3 + 6
-                this.style = 'rgb(90,191,246)'
+                this.style = `rgba(90,191,246,${Math.random() + 0.2})`
                 this.diameter = 2
             }
         }
@@ -95,6 +111,10 @@ class WeatherCanvas extends Component {
                 this.nextPosition()
             }
 
+            makeWind() {
+
+            }
+
             nextPosition() {
                 if(Math.random()<0.002) {
                     this.alpha = 0.7
@@ -125,15 +145,32 @@ class WeatherCanvas extends Component {
                     x : 0,
                     y : 0
                 }
-
             }
-
 
             draw = ()=> {
                 this.pointArray.push(new Thunder())
-
+                canvas.addEventListener('touchstart', this.updateTouchStart, false)
+                canvas.addEventListener('touchmove', this.updateTouch, false)
                 canvas.addEventListener('mousemove', this.updateMouse, false)
                 this.nextPosition()
+            }
+
+            updateTouchStart = (e)=> {
+                this.mouse.x = e.touches[0].pageX
+                this.mouse.y = e.touches[0].pageY
+            }
+
+            updateTouch = (e)=> {
+                this.mouse.px = this.mouse.x
+                this.mouse.py = this.mouse.y
+
+                this.mouse.x = e.touches[0].pageX
+                this.mouse.y = e.touches[0].pageY
+
+                this.mouse.vx = this.mouse.x - this.mouse.px
+                this.mouse.vy = this.mouse.y - this.mouse.py
+
+                this.makeWind(this.mouse)
             }
 
             updateMouse = (e)=> {
@@ -146,15 +183,18 @@ class WeatherCanvas extends Component {
                 this.mouse.vx = this.mouse.x - this.mouse.px
                 this.mouse.vy = this.mouse.y - this.mouse.py
 
-                console.log(this.mouse.x, this.mouse.y)
-                this.makeWind()
+                this.makeWind(this.mouse)
             }
 
             nextPosition = ()=> {
                 ctx.fillStyle = this.fillStyle
-                ctx.fillRect(0, 0, canvas.width, canvas.height)
+                // ctx.fillRect(0, 0, canvas.width, canvas.height)
+                const canvasImg = document.getElementById('background')
+                ctx.globalAlpha = 0.5
+                ctx.drawImage(canvasImg, 0, 0)
+                ctx.globalAlpha = 1
 
-                this.pointArray.push(new Rain())
+                // this.pointArray.push(new Rain())
                 this.pointArray.push(new Snow())
 
                 for(let i=0;i<this.pointArray.length;i++) {
@@ -166,8 +206,10 @@ class WeatherCanvas extends Component {
                 requestAnimationFrame(this.nextPosition)
             }
 
-            makeWind = ()=> {
-
+            makeWind = (mouse)=> {
+                for(let i=0;i<this.pointArray.length;i++) {
+                    this.pointArray[i].makeWind(mouse)
+                }
             }
         }
 
@@ -178,6 +220,7 @@ class WeatherCanvas extends Component {
         return (
             <div>
                 <canvas id="weather-canvas">您的设备不支持Canvas</canvas>
+                <img id="background" src={ img } />
             </div>
         )
     }
