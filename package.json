@@ -1,0 +1,59 @@
+{
+  "name": "react-weather",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npm run build-dll & webpack-dev-server",
+    "build": "npm run eslint && npm run build-dll && webpack --config webpack.config.production.js",
+    "build-dll": "npm run clean && webpack --config webpack.config.dll.js",
+    "clean": "rimraf dist/*",
+    "eslint": "node ./node_modules/eslint/bin/eslint.js src",
+    "analyze": "webpack --profile --json > assets/bundle-analyzer-stats.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shianqi/react-weather.git"
+  },
+  "author": "shianqi@imudges.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shianqi/react-weather/issues"
+  },
+  "homepage": "https://github.com/shianqi/react-weather#readme",
+  "dependencies": {
+    "classnames": "^2.2.5",
+    "normalize.css": "^7.0.0",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-hot-loader": "^3.0.0-beta.7"
+  },
+  "devDependencies": {
+    "assets-webpack-plugin": "^3.5.1",
+    "autoprefixer": "^7.1.2",
+    "babel-core": "^6.25.0",
+    "babel-eslint": "^7.2.3",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-transform-object-assign": "^6.22.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-register": "^6.24.1",
+    "css-loader": "^0.28.4",
+    "eslint": "^4.2.0",
+    "eslint-plugin-css-modules": "^2.7.2",
+    "eslint-plugin-react": "^7.1.0",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "file-loader": "^0.11.2",
+    "html-webpack-plugin": "^2.29.0",
+    "open-browser-webpack-plugin": "0.0.5",
+    "postcss-loader": "^2.0.6",
+    "rimraf": "^2.6.1",
+    "style-loader": "^0.18.2",
+    "url-loader": "^0.5.9",
+    "webpack": "^3.3.0",
+    "webpack-bundle-analyzer": "^2.8.3",
+    "webpack-dev-server": "^2.5.1",
+    "webpack-md5-hash": "0.0.5"
+  }
+}
