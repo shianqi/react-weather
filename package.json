@@ -1,6 +1,6 @@
 {
   "name": "react-weather",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,7 @@
     "build": "npm run eslint && npm run build-dll && webpack --config webpack.config.production.js",
     "build-dll": "npm run clean && webpack --config webpack.config.dll.js",
     "clean": "rimraf dist/*",
+    "gh-pages": "npm run build && gh-pages -d dist",
     "eslint": "node ./node_modules/eslint/bin/eslint.js src",
     "analyze": "webpack --profile --json > assets/bundle-analyzer-stats.json"
   },
@@ -45,6 +46,7 @@
     "eslint-plugin-react": "^7.1.0",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.2",
+    "gh-pages": "^1.0.0",
     "html-webpack-plugin": "^2.29.0",
     "open-browser-webpack-plugin": "0.0.5",
     "postcss-loader": "^2.0.6",

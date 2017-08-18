@@ -1,6 +1,9 @@
 # Canvas 天气系统
 
 ## 预览
+```
+https://shianqi.github.io/react-weather/
+```
 
 ## 开发
 ```

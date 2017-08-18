@@ -137,7 +137,7 @@ module.exports = {
 
         //用模板生成HTML页面
         new HtmlWebpackPlugin({
-            title: 'Elevoc',
+            title: 'react-weather',
             bundleName: bundleConfig.vendor.js,
             filename: 'index.html',
             favicon: resolve(__dirname, 'template/favicon.ico'),
