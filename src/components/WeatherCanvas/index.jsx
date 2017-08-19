@@ -1,5 +1,7 @@
 import React, { Component } from 'react'
-import img from './img/sidebar-bg.png'
+import img_background from './img/sidebar-bg.png'
+import img_cloud from './img/cloud_img.png'
+import img_sand from './img/sand_img.png'
 
 class WeatherCanvas extends Component {
     componentDidMount() {
@@ -15,9 +17,10 @@ class WeatherCanvas extends Component {
         document.documentElement.style.overflowY = 'hidden'
         window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame
 
-        /**
-         *
-         */
+        const canvasImg = document.getElementById('background')
+        const cloud_element = document.getElementById('cloud')
+        const sand_element = document.getElementById('sand')
+
         class Point {
             constructor() {
                 this.x = Math.random() * canvas.width
@@ -63,10 +66,10 @@ class WeatherCanvas extends Component {
             }
 
             shouldRemove() {
-                if(this.x > canvas.width || this.x < 0) {
+                if(this.x > canvas.width * 1.2 || this.x < canvas.width * -0.2) {
                     this.isLive = false
                 }
-                if(this.y > canvas.height || this.y < 0) {
+                if(this.y > canvas.height * 1.2 || this.y < canvas.height * -0.) {
                     this.isLive = false
                 }
             }
@@ -78,7 +81,7 @@ class WeatherCanvas extends Component {
                 this.x_speed = Math.random() - 0.5
                 this.y_speed = Math.random()*3 + 6
                 this.style = `rgba(90,191,246,${Math.random() + 0.2})`
-                this.diameter = 2
+                this.diameter = Math.random() * 2 + 1
             }
         }
 
@@ -133,6 +136,102 @@ class WeatherCanvas extends Component {
             }
         }
 
+        /**
+         * 雾
+         */
+        class Fog extends Point {
+            constructor(args) {
+                super(args)
+                this.x = 0
+                this.y = Math.random() * canvas.height * 0.85
+                this.x_speed = Math.random() * 1.2 + 0.3
+                this.y_speed = Math.random() * 0.2 - 0.1
+                this.style = `rgba(90,191,246,${Math.random() + 0.2})`
+                this.diameter = Math.random() * 2 + 1
+
+            }
+
+            draw() {
+                ctx.beginPath()
+                ctx.lineCap = 'round'
+                ctx.lineWidth = this.diameter
+                ctx.strokeStyle= this.style
+                ctx.globalAlpha = 0.3
+                ctx.drawImage(
+                    cloud_element,
+                    this.x - cloud_element.width/2,
+                    this.y - cloud_element.height/2,
+                    cloud_element.width/2,
+                    cloud_element.height/2
+                )
+                ctx.globalAlpha = 1
+                //ctx.moveTo(this.x, this.y)
+                this.nextPosition()
+                //ctx.lineTo(this.x, this.y)
+                ctx.stroke()
+                ctx.closePath()
+                this.shouldRemove()
+            }
+        }
+
+        class Cloud extends Point {
+            constructor(args) {
+                super(args)
+                this.x = Math.random() * canvas.width - canvas.width * 0.2
+                this.y = Math.random() * canvas.height * 0.2 + canvas.height * 0.1
+                this.x_speed = Math.random() * 0.6 + 0.2
+                this.y_speed = 0
+                this.style = `rgba(90,191,246,${Math.random() + 0.2})`
+                this.diameter = Math.random() * 2 + 1
+
+            }
+
+            draw() {
+                ctx.beginPath()
+                ctx.lineCap = 'round'
+                ctx.lineWidth = this.diameter
+                ctx.strokeStyle= this.style
+                ctx.globalAlpha = 0.9
+                ctx.drawImage(cloud_element, this.x - cloud_element.width/2, this.y - cloud_element.height/2)
+                ctx.globalAlpha = 1
+                //ctx.moveTo(this.x, this.y)
+                this.nextPosition()
+                //ctx.lineTo(this.x, this.y)
+                ctx.stroke()
+                ctx.closePath()
+                this.shouldRemove()
+            }
+        }
+
+        class SandStorm extends Point {
+            constructor(args) {
+                super(args)
+                this.x = 0
+                this.y = Math.random() * canvas.height * 0.8
+                this.x_speed = Math.random() * 10  - 0.5
+                this.y_speed = Math.random() - 0.5
+                this.style = `rgba(90,191,246,${Math.random() + 0.2})`
+                this.diameter = Math.random() * 2 + 1
+
+            }
+
+            draw() {
+                ctx.beginPath()
+                ctx.lineCap = 'round'
+                ctx.lineWidth = this.diameter
+                ctx.strokeStyle= this.style
+                ctx.globalAlpha = 0.04
+                ctx.drawImage(sand_element, this.x - sand_element.width/2, this.y - sand_element.height/2)
+                ctx.globalAlpha = 1
+                //ctx.moveTo(this.x, this.y)
+                this.nextPosition()
+                //ctx.lineTo(this.x, this.y)
+                ctx.stroke()
+                ctx.closePath()
+                this.shouldRemove()
+            }
+        }
+
         class Weather {
             constructor() {
                 this.fillStyle = 'rgba(0,0,0,0.5)'
@@ -148,10 +247,22 @@ class WeatherCanvas extends Component {
             }
 
             draw = ()=> {
-                this.pointArray.push(new Thunder())
-                canvas.addEventListener('touchstart', this.updateTouchStart, false)
-                canvas.addEventListener('touchmove', this.updateTouch, false)
-                canvas.addEventListener('mousemove', this.updateMouse, false)
+                //this.pointArray.push(new Thunder())
+                canvas.addEventListener('touchstart', this.updateTouchStart, {
+                    capture: false,
+                    passive: true,
+                    once: false
+                })
+                canvas.addEventListener('touchmove', this.updateTouch, {
+                    capture: false,
+                    passive: false,
+                    once: false
+                })
+                canvas.addEventListener('mousemove', this.updateMouse, {
+                    capture: false,
+                    passive: true,
+                    once: false
+                })
                 this.nextPosition()
             }
 
@@ -161,6 +272,7 @@ class WeatherCanvas extends Component {
             }
 
             updateTouch = (e)=> {
+                e.preventDefault()
                 this.mouse.px = this.mouse.x
                 this.mouse.py = this.mouse.y
 
@@ -189,13 +301,14 @@ class WeatherCanvas extends Component {
             nextPosition = ()=> {
                 ctx.fillStyle = this.fillStyle
                 // ctx.fillRect(0, 0, canvas.width, canvas.height)
-                const canvasImg = document.getElementById('background')
-                ctx.globalAlpha = 0.5
-                ctx.drawImage(canvasImg, 0, 0)
-                ctx.globalAlpha = 1
 
-                // this.pointArray.push(new Rain())
-                this.pointArray.push(new Snow())
+                this.drawBackground()
+
+                //this.pointArray.push(new Rain())
+                //this.pointArray.push(new Fog())
+                //this.pointArray.push(new Cloud())
+                //this.pointArray.push(new SandStorm())
+                this.addPoint(Snow, 1)
 
                 for(let i=0;i<this.pointArray.length;i++) {
                     this.pointArray[i].draw()
@@ -204,6 +317,33 @@ class WeatherCanvas extends Component {
                     return item.isLive
                 })
                 requestAnimationFrame(this.nextPosition)
+            }
+
+            addPoint = (Ele, probability)=> {
+                if(probability===1) {
+                    this.pointArray.push(new Ele())
+                }else if(Math.random() < probability) {
+                    this.pointArray.push(new Ele())
+                }
+            }
+
+            drawBackground = ()=> {
+                let scale = 0
+                if(canvas.height > canvas.width) {
+                    scale = canvas.height / canvasImg.height
+                    ctx.globalAlpha = 0.5
+                    const _x = (canvasImg.width*scale - canvas.width) /2
+                    ctx.drawImage(canvasImg, -_x, 0, canvasImg.width * scale, canvasImg.height * scale)
+                    ctx.globalAlpha = 1
+                }else{
+                    scale = canvas.width / canvasImg.width
+                    ctx.globalAlpha = 0.5
+                    const _y = (canvasImg.height*scale - canvas.height) /2
+                    ctx.drawImage(canvasImg, 0, -_y, canvasImg.width * scale, canvasImg.height * scale)
+                    ctx.globalAlpha = 1
+                }
+
+
             }
 
             makeWind = (mouse)=> {
@@ -220,7 +360,9 @@ class WeatherCanvas extends Component {
         return (
             <div>
                 <canvas id="weather-canvas">您的设备不支持Canvas</canvas>
-                <img id="background" src={ img } />
+                <img id="background" src={ img_background } />
+                <img id="cloud" src={ img_cloud } />
+                <img id="sand" src={ img_sand } />
             </div>
         )
     }
