@@ -1,9 +1,16 @@
 import React, { Component } from 'react'
-import img_background from './img/sidebar-bg.png'
+import img_background1 from './img/background1.png'
+import img_background2 from './img/background2.png'
+import img_background3 from './img/background3.png'
+import img_background4 from './img/background4.png'
 import img_cloud from './img/cloud_img.png'
 import img_sand from './img/sand_img.png'
 
 class WeatherCanvas extends Component {
+    constructor(props) {
+        super(props)
+    }
+
     componentDidMount() {
         const canvas = document.getElementById('weather-canvas')
         const ctx = canvas.getContext('2d')
@@ -17,9 +24,19 @@ class WeatherCanvas extends Component {
         document.documentElement.style.overflowY = 'hidden'
         window.requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame
 
-        const canvasImg = document.getElementById('background')
-        const cloud_element = document.getElementById('cloud')
-        const sand_element = document.getElementById('sand')
+        const background_element1 = document.createElement('img')
+        background_element1.src = img_background1
+        const background_element2 = document.createElement('img')
+        background_element2.src = img_background2
+        const background_element3 = document.createElement('img')
+        background_element3.src = img_background3
+        const background_element4 = document.createElement('img')
+        background_element4.src = img_background4
+
+        const cloud_element = document.createElement('img')
+        cloud_element.src = img_cloud
+        const sand_element = document.createElement('img')
+        sand_element.src = img_sand
 
         class Point {
             constructor() {
@@ -136,9 +153,6 @@ class WeatherCanvas extends Component {
             }
         }
 
-        /**
-         * 雾
-         */
         class Fog extends Point {
             constructor(args) {
                 super(args)
@@ -236,6 +250,8 @@ class WeatherCanvas extends Component {
             constructor() {
                 this.fillStyle = 'rgba(0,0,0,0.5)'
                 this.pointArray = []
+                this.shiftX = 40
+                this.shiftY = 10
                 this.mouse = {
                     vx : 0,
                     vy : 0,
@@ -329,21 +345,46 @@ class WeatherCanvas extends Component {
 
             drawBackground = ()=> {
                 let scale = 0
+                let dx = 0
+                let dy = 0
                 if(canvas.height > canvas.width) {
-                    scale = canvas.height / canvasImg.height
-                    ctx.globalAlpha = 0.5
-                    const _x = (canvasImg.width*scale - canvas.width) /2
-                    ctx.drawImage(canvasImg, -_x, 0, canvasImg.width * scale, canvasImg.height * scale)
-                    ctx.globalAlpha = 1
+                    scale = canvas.height / background_element1.height
+                    dx = (canvas.width - background_element1.width*scale) /2
                 }else{
-                    scale = canvas.width / canvasImg.width
-                    ctx.globalAlpha = 0.5
-                    const _y = (canvasImg.height*scale - canvas.height) /2
-                    ctx.drawImage(canvasImg, 0, -_y, canvasImg.width * scale, canvasImg.height * scale)
-                    ctx.globalAlpha = 1
+                    scale = canvas.width / background_element1.width
+                    dy = (canvas.height - background_element1.height*scale) /2
                 }
-
-
+                const background = [
+                    {
+                        element: background_element1,
+                        layer: 0
+                    },
+                    {
+                        element: background_element2,
+                        layer: 33.33
+                    },
+                    {
+                        element: background_element3,
+                        layer: 66.67
+                    },
+                    {
+                        element: background_element4,
+                        layer: 100
+                    }
+                ]
+                background.forEach((item)=>{
+                    const { element, layer } = item
+                    const drawX = dx + (this.mouse.x - canvas.width / 2) / (canvas.width / 2) * this.shiftX * (layer/50-1)
+                    const drawY = dy + (this.mouse.y - canvas.height / 2) / (canvas.height / 2) * this.shiftY * (layer/50-1)
+                    ctx.drawImage(
+                        element,
+                        drawX - this.shiftX,
+                        drawY - this.shiftY,
+                        element.width * scale + 2 * this.shiftX,
+                        element.height * scale + 2 *this.shiftY
+                    )
+                })
+                ctx.globalAlpha = 1
             }
 
             makeWind = (mouse)=> {
@@ -360,9 +401,6 @@ class WeatherCanvas extends Component {
         return (
             <div>
                 <canvas id="weather-canvas">您的设备不支持Canvas</canvas>
-                <img id="background" src={ img_background } />
-                <img id="cloud" src={ img_cloud } />
-                <img id="sand" src={ img_sand } />
             </div>
         )
     }
